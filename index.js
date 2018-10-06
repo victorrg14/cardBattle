@@ -4,17 +4,17 @@ var host=config.host;
 var port=config.port;
 var exp=require("express");
 var app=exp(); 
-var modelo=require("servidor/modelo.js");
+var modelo=require("./servidor/modelo.js");
 
-var juego=new Juego();
+var juego=new modelo.Juego();
 
 //app.use(app.router);
 //app.use(exp.static(__dirname + "/public"));
 
 app.get("/",function(request,response){
-	response.send("hola");
+	var json={};
+	response.send(json);
 });
-
 /*
 app.get("/hola/:text",function(request,response){
 	response.send("Hola "+request.params.text);
@@ -39,4 +39,5 @@ app.get("/user/:id",function(request,response){
 	}
 	response.send
 })*/
+console.log("Servidor escuchando en "+host+":"+port);
 app.listen(port,host);

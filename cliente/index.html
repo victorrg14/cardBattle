@@ -1,11 +1,17 @@
 <html>
 	<head>
 		<title>Card Battle</title>
-		<script src="./src/modelo.js"></script>
+		<script src="./servidor/modelo.js"></script>
 	</head>
 	<body>
 		<script>
-			juego= new Juego();
+			juego=new Juego();
+			usr1=new Usuario("pepe");
+			usr2=new Usuario("juan");
+			juego.agregarUsuario(usr1);
+			juego.agregarUsuario(usr2);
+			usr1.crearPartida("prueba");
+			usr2.eligePartida("prueba");
 		</script>
 
 	</body>
