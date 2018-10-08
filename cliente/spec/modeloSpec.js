@@ -5,14 +5,16 @@ describe("El juego de las cartas...", function() {
   beforeEach(function() {
     juego = new Juego();
     usr1 = new Usuario("pepe");
-    usr1 = new Usuario("juan");
+    usr2 = new Usuario("juan");
   });
 
   it("Deberia tener una colección de cartas. Compruebo condiciones iniciales (cartas, usuario)", function() {
     expect(juego.cartas).toBeDefined();
-    expect(juego.cartas.length).toEqual(30);
+    expect(juego.cartas.length).toEqual(0);
     expect(juego.usuarios).toBeDefined();
     expect(juego.usuarios.length).toEqual(0);
+    expect(juego.partidas).toBeDefined();
+    expect(juego.partidas.length).toEqual(0);
   });
 
   it("Los usuarios tienen un mazo", function() {
@@ -45,5 +47,42 @@ describe("El juego de las cartas...", function() {
     expect(usr1.mazo.length).toEqual(30);
     expect(usr2.mazo.length).toEqual(30);
   });
+
+  it("Pepe crea una partida, juan la elige y se les asigna las zonas correspondientes", function() {
+    juego.agregarUsuario(usr1);
+    juego.agregarUsuario(usr2);
+    usr1.crearPartida("prueba");
+    usr2.eligePartida("prueba");
+    expect(juego.usuarios[0].partida.nombre).toEqual("prueba");
+    expect(usr1.partida.nombre).toEqual("prueba");
+    expect(juego.usuarios[1].partida.nombre).toEqual("prueba");
+    expect(juego.usuarios[0].zona.nombre).toEqual("arriba");
+    expect(juego.usuarios[1].zona.nombre).toEqual("abajo");
+    if(usr1.turno){
+      expect(usr2.turno).toBe(false);
+    }
+    else{
+      expect(usr1.turno).toBe(false);
+    }
+
+  });
+
+  it("Comprobar que funciona la funcion pasarTurno", function(){
+
+    juego.agregarUsuario(usr1);
+    juego.agregarUsuario(usr2);
+    usr1.crearPartida("prueba");
+    usr2.eligePartida("prueba");
+    usr1.turno=true;
+    usr2.turno=false;
+    usr1.pasarTurno();
+    expect(usr1.turno).toBe(false);
+    expect(usr2.turno).toBe(true);
+
+
+  })
+
+
+
 
 });
