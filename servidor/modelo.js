@@ -1,3 +1,5 @@
+var _=require("underscore");
+
 function Juego(){
 	this.cartas=[];
 	this.usuarios=[];
@@ -6,7 +8,7 @@ function Juego(){
 		this.cartas.push(carta);
 	}
 	this.agregarUsuario=function(usuario){
-		usuario.mazo=this.crearColeccion();
+		usuario.mazo=_.shuffle(this.crearColeccion());
 		usuario.juego=this;
 		this.usuarios.push(usuario);
 	}
@@ -63,20 +65,26 @@ function Partida(nombre){
 	this.comprobarInicio=function(){
 		if(this.usuariosPartida.length==2){
 			this.turnoInicial();
+			this.asignarManoInicial();
+		}
+	}
+	this.asognarManoInicial=function(){
+		for(var i=0; i<this.usuariosPartida.length; i++){
+			this.usuariosPartida[i].manoInicial();
 		}
 	}
 	this.turnoInicial=function(){
 		var numero=Math.round(Math.random());
-		this.usuariosPartida[numero].turno=true;
+		this.usuariosPartida[numero].esMiTurno();
 	}
 	this.cambiarTurno=function(){
 		if(this.usuariosPartida[0].turno){
 			this.usuariosPartida[0].turno=false;
-			this.usuariosPartida[1].turno=true;
+			this.usuariosPartida[1].esMiTurno();
 		}
 		else{
 			this.usuariosPartida[1].turno=false;
-			this.usuariosPartida[0].turno=true;
+			this.usuariosPartida[0].esMiTurno();
 		}
 	}
 	this.crearTablero();
@@ -123,11 +131,15 @@ function Zona(nombre){
 function Usuario(nombre){
 	this.nombre=nombre;
 	this.juego=undefined;
-	this.mazo=[];
-	this.mano=[];
+	//this.mazo=[];
+	//this.mano=[];
+	this.ataque=[];
 	this.turno=false;
 	this.zona=undefined;
 	this.partida=undefined;
+	this.elixir=1;
+	this.consumido=0;
+	this.vidas=20;
 	this.asignarPartida=function(partida){
 		this.partida=partida;
 	}
@@ -143,6 +155,50 @@ function Usuario(nombre){
 	this.pasarTurno=function(){
 		this.partida.cambiarTurno();
 	}
+	this.esMiTurno=function(){
+
+		this.turno=true;
+		this.cogerCarta();
+		//this.mano.push(carta);
+		this.elixir=this.consumido+1;
+		this.consumido=0;
+	}
+	this.cogerCarta=function(){
+		var carta;
+		return this.mazo.find(function(each){
+			return each.posicion=="mazo";
+		});
+		carta.posicion="mano";	
+	}
+	this.jugarCarta=function(carta){
+		if(this.elixir>=carta.coste){
+			carta.posicion="ataque";
+			this.elixir=this.elixir-carta.coste;
+			this.consumido=this.consumido+carta.coste;
+		}
+
+		//this.ataque.push(carta);
+
+	}
+
+	this.ataque=function(carta,objetivo){
+		objetivo.esAtacado(carta);
+
+	}
+	this.esAtacado=function(carta){
+		this.vidas=this.vidas-carta.ataque;
+		this.comprobarVidas();
+	}
+	this.comprobarVidas=function(){
+		if(this.vidas<=0){
+			this.juego.fin();
+		}
+	}
+	this.manoInicial=function(){
+		for(var i=0; i<5;i++){
+			this.cogerCarta();
+		}
+	}
 }
 
 function Carta(nombre,vidas,ataque,coste){
@@ -152,6 +208,15 @@ function Carta(nombre,vidas,ataque,coste){
 	this.nombre=nombre;
 	this.coste=coste;
 	this.posicion="mazo";
+	this.esAtacado=function(carta){
+		this.vidas=this.vidas-carta.ataque;
+		this.comprobarVidas();
+	}
+	this.comprobarVidas=function(){
+		if(this.vidas<=0){
+			this.posicion="cementerio";
+		}
+	}
 }
 
 module.exports.Juego=Juego;
